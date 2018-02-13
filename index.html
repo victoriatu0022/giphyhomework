@@ -1,0 +1,114 @@
+
+<html lang="en-us">
+    <head>
+        
+        <title>Giphy Homework</title>
+        
+        <!--bootstrap-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    </head>
+            <!-- BODY information to be filled with gif -->
+    <body>
+        <div id = "row">
+                
+             <div class="col-md-8">
+                        <div id="listTop">  </div>  
+                        <div id="gifDisplay">  </div>
+            </div>
+                     <div class="col-md-4">
+                        <form>
+                         <label for="newTopic">Add a topic: </label><br>
+                            <input type="text" id="newTopic"><br>
+                            <input id="topicSubmit" type="submit" value="Add!">
+                         </form>
+
+                        </div>
+        </div>
+              
+
+        <!-- JQUERY JAVASCRIPT HERE -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      
+    
+        <script>
+            // array for the looping of the topics
+            var topics = ["dog","cat","hamster", "aggretsuko", "gudetama", "sanrio"];
+            function renderButtons() {
+                $("#listTop").empty();
+                for (i = 0; i < topics.length; i ++) {
+                    // create a new button element for each topic
+                    var newButton = $("<button>");
+                    // assign a class to the buttons
+                    newButton.addClass("topicButton");
+                    // populate the buttton with the text of the topic
+                    newButton.text(topics[i].toUpperCase());
+                    // assign the topic string to the value of the button
+                    newButton.val(topics[i]);
+                    // add the button to the div to display on the page
+                    $("#listTop").append(newButton);
+
+                }
+            };
+
+        
+            $(document).on("click", ".topicButton", function () {
+                var searchTopic = $(this).val();
+                $("#gifDisplay").empty();
+             
+
+                $.ajax({url: "https://api.giphy.com/v1/gifs/search?q=" + searchTopic + "&limit=10&api_key=hDUcXVdJOF1LvXXN8sqDffLePE2zyb51", method: "GET"}).then           (function(response) {
+                    console.log(response);
+                        for (i = 0; i < response.data.length; i++) {
+                             var gifURL = (response.data[i].images.fixed_height_small_still.url);
+
+                        var newGif = $("<img>");
+                        var newHeader = $("<h5>");
+                        var newDiv = $("<div>");
+                            newGif.addClass("gifImg");
+                            newDiv.addClass("gifHolder");
+                            newDiv.attr("id", "gif" + i);
+
+                        newGif.val(i);
+                        newGif.attr("data-alt1", response.data[i].images.fixed_height_small.url);
+                        newGif.attr("data-alt2", response.data[i].images.fixed_height_small_still.url);
+
+                                 newGif.attr("src", gifURL);
+
+                        newHeader.text("Rating: " + response.data[i].rating.toUpperCase());
+
+                        $("#gifDisplay").append(newDiv);
+                        $("#gif" + i).append(newHeader);
+                        $("#gif" + i).append(newGif); 
+                    }                    
+                })
+            })
+
+            // on click function for the gifs
+            $(document).on("click", ".gifImg", function () {
+                if ($(this).attr("src") === $(this).attr("data-alt1")) {
+                    $(this).attr("src", $(this).attr("data-alt2"));
+                } else if ($(this).attr("src") === $(this).attr("data-alt2")) {
+                    $(this).attr("src", $(this).attr("data-alt1"));
+                }    
+            })
+
+            //submit new portion
+            $(document).on("click", "#topicSubmit", function () {
+                event.preventDefault();
+                var newTopic = $("#newTopic").val().trim();
+                if (newTopic != "" && !topics.includes(newTopic)) {
+                    topics.push(newTopic);
+                    renderButtons();
+                }    
+            })
+
+                     renderButtons();
+        
+        </script>
+    </body>
+
+
+
+
+</html>
